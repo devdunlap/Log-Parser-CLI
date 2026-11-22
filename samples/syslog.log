@@ -1,0 +1,6 @@
+Nov 21 13:58:01 workstation systemd[1]: Started Daily apt download activities.
+Nov 21 14:02:11 workstation sshd[1234]: Accepted password for andrew from 192.168.1.20 port 51234 ssh2
+Nov 21 14:02:13 workstation sshd[1234]: pam_unix(sshd:session): session opened for user andrew
+Nov 21 14:04:52 workstation CRON[2210]: (root) CMD run-parts /etc/cron.hourly
+Nov  3 09:15:00 workstation kernel: [12345.678901] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Nov 21 14:05:01 workstation app[987]: ERROR request 7f3a failed after 3 retries

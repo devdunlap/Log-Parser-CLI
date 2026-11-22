@@ -1,0 +1,12 @@
+2026-11-21 13:58:01.002 INFO [main] com.example.App - Application starting, profile=prod
+2026-11-21 13:58:04.517 INFO [main] com.example.db.Pool - Connection pool ready (size=20)
+2026-11-21 14:02:11.403 ERROR [pool-2-thread-1] com.example.payments.PaymentService - Payment failed for order 88131: card declined
+2026-11-21 14:02:11.403 ERROR [pool-2-thread-1] com.example.payments.PaymentService - Payment failed for order 88131: card declined
+2026-11-21 14:02:12.020 WARN [pool-2-thread-1] com.example.payments.PaymentService - Retrying payment for order 88131 (attempt 2)
+2026-11-21 14:03:02.118 ERROR [http-nio-8080-exec-4] com.example.api.OrderController - Unhandled exception while creating order
+java.lang.IllegalStateException: Inventory service unavailable
+	at com.example.api.OrderController.createOrder(OrderController.java:87)
+	at com.example.api.OrderController.handle(OrderController.java:41)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-11-21 14:03:03.001 INFO [http-nio-8080-exec-4] com.example.api.OrderController - Recovered, serving cached inventory
+2026-11-21 14:05:44.900 DEBUG [scheduler-1] com.example.jobs.CleanupJob - Removed 14 expired sessions

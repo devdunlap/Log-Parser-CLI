@@ -1,0 +1,6 @@
+{"timestamp": "2026-11-21T14:02:11Z", "level": "INFO", "source": "billing", "message": "Invoice 5521 generated"}
+{"timestamp": "2026-11-21T14:03:40Z", "level": "WARN", "source": "billing", "message": "Card expiring soon for customer 9182"}
+{"timestamp": "2026-11-21T14:04:55Z", "level": "ERROR", "source": "billing", "message": "Failed to charge cus
+this is not json at all
+{"timestamp": "2026-11-21T14:05:12Z", "level": "INFO", "source": "billing", "message": "Retry succeeded for customer 7710"}
+{"level": "INFO", "message": "missing timestamp and source fields"}

@@ -1,0 +1,5 @@
+203.0.113.42 - - [21/Nov/2026:14:02:11 -0600] "GET /api/orders HTTP/1.1" 200 4312 "https://example.com/cart" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+198.51.100.7 - maria [21/Nov/2026:14:02:19 -0600] "POST /api/orders HTTP/1.1" 201 812 "https://example.com/checkout" "curl/8.4.0"
+203.0.113.42 - - [21/Nov/2026:14:03:55 -0600] "GET /static/logo.png HTTP/1.1" 304 - - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+192.0.2.99 - - [21/Nov/2026:14:04:10 -0600] "GET /admin HTTP/1.1" 403 199 "-" "python-requests/2.31.0"
+203.0.113.42 - - [21/Nov/2026:14:04:31 -0600] "DELETE /api/orders/88131 HTTP/1.1" 500 542 "https://example.com/orders" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
