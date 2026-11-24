@@ -12,7 +12,6 @@ def test_help_exits_zero(capsys):
     assert "parse" in capsys.readouterr().out
 
 
-@pytest.mark.skip(reason="Weekend 1: passes once the logback parser lands")
 def test_parse_logback_sample_end_to_end(tmp_path):
     out = tmp_path / "parsed.jsonl"
     rc = main(["parse", "samples/app.log", "--format", "logback", "--out", str(out)])

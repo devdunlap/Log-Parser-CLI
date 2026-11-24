@@ -19,9 +19,9 @@ structure, packaging (pyproject), the CLI argument plumbing, the output
 writers, the shared record shape, synthetic sample logs, the CI
 workflow, and test files written as executable specs.
 
-**The four parsers and the dedupe logic are mine to write.** The logback
-tests in `tests/test_parsers.py` fail until `parse_logback` is
-implemented - making them pass is Weekend 1.
+The original plan was for me to write the four parsers and dedupe logic.
+The logback tests in `tests/test_parsers.py` were written before the
+implementation; making them pass is Weekend 1.
 
 ## Delegated / reviewed / changed
 
@@ -30,7 +30,8 @@ implemented - making them pass is Weekend 1.
      space-padded day - caught by the Nov 3 sample line, fixed by hand."
      If nothing went wrong, say what you verified instead. -->
 
-- Weekend 1:
+- Weekend 1: Asked Copilot to implement the logback parser and add tests
+  for MDC IDs and invalid timestamps. Human review is pending.
 - Week 1 evenings:
 - Weekend 2:
 

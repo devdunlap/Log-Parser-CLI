@@ -62,6 +62,66 @@ def test_logback_unparseable_first_line_becomes_reject():
     assert outcome.rejects[0].reason  # a reason is always given
 
 
+@pytest.mark.parametrize(
+    "line",
+    [
+        "2026-11-21 14:02:11.403 INFO [main] "
+        "[traceId=abc, correlationId=xyz] com.example.App - started",
+        "2026-11-21 14:02:11.403 INFO [main] "
+        "com.example.App [traceId=abc, correlationId=xyz] - started",
+        "2026-11-21 14:02:11.403 INFO [main] "
+        "com.example.App - [traceId=abc, correlationId=xyz] started",
+    ],
+)
+def test_logback_extracts_mdc_ids(line):
+    (record,) = parse_logback([line]).records
+    assert record.extra == {
+        "thread": "main",
+        "traceId": "abc",
+        "correlationId": "xyz",
+    }
+    assert record.message == "started"
+
+
+@pytest.mark.parametrize("message", ["[ready] started", "[other_traceId=abc] started"])
+def test_logback_keeps_bracketed_message_that_is_not_mdc(message):
+    line = f"2026-11-21 14:02:11.403 INFO [main] com.example.App - {message}"
+    (record,) = parse_logback([line]).records
+    assert record.message == message
+
+
+def test_logback_normalizes_comma_timestamp_and_extracts_snake_case_ids():
+    line = (
+        "2026-11-21 14:02:11,403 INFO [main] "
+        "[trace_id=abc correlation_id=xyz] com.example.App - started"
+    )
+    (record,) = parse_logback([line]).records
+    assert record.timestamp == "2026-11-21T14:02:11.403"
+    assert record.extra["trace_id"] == "abc"
+    assert record.extra["correlation_id"] == "xyz"
+
+
+def test_logback_rejects_invalid_timestamp_without_attaching_following_lines():
+    bad_line = "2026-02-30 14:02:11.403 ERROR [main] com.example.App - failed"
+    outcome = parse_logback([LOGBACK_LINE, bad_line, "stack trace", LOGBACK_LINE])
+    assert outcome.total_lines == 4
+    assert [reject.line_number for reject in outcome.rejects] == [2, 3]
+    assert outcome.rejects[0].raw == bad_line
+    assert all(reject.reason for reject in outcome.rejects)
+    assert len(outcome.records) == 2
+    assert outcome.records[0].message.endswith("card declined")
+
+
+def test_logback_accepts_line_iterators_and_preserves_continuation_indentation():
+    lines = iter([LOGBACK_LINE + "\n", "\tat example.App.run(App.java:1)\n"])
+    outcome = parse_logback(lines)
+    assert outcome.total_lines == 2
+    assert outcome.records[0].message.endswith(
+        "\n\tat example.App.run(App.java:1)"
+    )
+    assert parse_logback([]).total_lines == 0
+
+
 @pytest.mark.skip(reason="Week 1: syslog parser (edge cases: no year, padded day)")
 def test_syslog_parses_line_without_year():
     outcome = parse_syslog(

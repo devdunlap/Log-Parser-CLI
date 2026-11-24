@@ -8,17 +8,28 @@ Conventions (from the spec):
   lines are appended to that entry's message, not parsed as new entries.
 - Timestamps are normalized to ISO 8601 in the record.
 
-Each function below is a stub with the contract written out. Implementing
-them - patterns, continuation handling, edge cases - is the project.
+The remaining parser stubs have their contracts written out below.
 """
 
 import re
 from collections.abc import Iterable
+from datetime import datetime
 
 from .records import LogRecord, ParseOutcome, Reject
 
-# TODO(you): compile one pattern per format here, named groups for the
-# fields each format carries.
+LOGBACK_PATTERN = re.compile(
+    r"^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
+    r"(?:[.,]\d{1,6})?)\s+"
+    r"(?P<level>[A-Z]+)\s+\[(?P<thread>[^\]]+)\]\s+"
+    r"(?:\[(?P<mdc_before>[^\]]*)\]\s+)?"
+    r"(?P<logger>\S+)\s+"
+    r"(?:\[(?P<mdc_after>[^\]]*)\]\s+)?"
+    r"-\s*(?:\[(?P<mdc_message>(?=[^\]]*(?<![A-Za-z0-9_])"
+    r"(?:traceId|trace_id|correlationId|correlation_id)=[^\s,\]])[^\]]*)\]\s*)?"
+    r"(?P<message>.*)$"
+)
+
+# TODO(you): compile patterns for the remaining formats.
 #
 # logback:  timestamp, level, [thread], logger, message
 #           2026-11-21 14:02:11.403 ERROR [pool-2] com.example.App - msg
@@ -42,7 +53,49 @@ def parse_logback(lines: Iterable[str]) -> ParseOutcome:
     traces) and are appended to the previous record's message.
     A non-matching line with no previous record is a Reject.
     """
-    raise NotImplementedError("Weekend 1: implement the logback parser")
+    records: list[LogRecord] = []
+    rejects: list[Reject] = []
+    current: LogRecord | None = None
+    total = 0
+
+    for total, raw in enumerate(lines, start=1):
+        line = raw.rstrip("\r\n")
+        match = LOGBACK_PATTERN.match(line)
+        if match is None:
+            if current is None:
+                rejects.append(Reject(total, line, "Not a Logback entry"))
+            else:
+                current.message += "\n" + line
+            continue
+
+        timestamp = match["timestamp"].replace(",", ".")
+        try:
+            datetime.fromisoformat(timestamp)
+        except ValueError:
+            rejects.append(Reject(total, line, "Invalid Logback timestamp"))
+            current = None
+            continue
+
+        extra = {"thread": match["thread"]}
+        for group in (match["mdc_before"], match["mdc_after"], match["mdc_message"]):
+            if group:
+                for item in group.replace(",", " ").split():
+                    key, separator, value = item.partition("=")
+                    if separator and value and key in (
+                        "traceId", "trace_id", "correlationId", "correlation_id"
+                    ):
+                        extra[key] = value
+
+        current = LogRecord(
+            timestamp=timestamp.replace(" ", "T", 1),
+            level=match["level"],
+            source=match["logger"],
+            message=match["message"],
+            extra=extra,
+        )
+        records.append(current)
+
+    return _outcome(records, rejects, total)
 
 
 def parse_syslog(lines: Iterable[str], *, year: int) -> ParseOutcome:

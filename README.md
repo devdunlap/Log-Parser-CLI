@@ -65,6 +65,10 @@ and where the model got things wrong are documented in
 
 ## Status
 
-Scaffolded Nov 22, 2026. Parsers land in order: logback (Weekend 1),
-syslog + apache (week 1 evenings), JSON-ish + dedupe (Weekend 2).
+The logback parser is implemented. It accepts optional MDC bracket groups
+between the thread and logger, between the logger and `-`, or immediately
+after `-` when it contains an ID. It copies
+`traceId`, `trace_id`, `correlationId`, and `correlation_id` into `extra`.
+Syslog + apache (week 1 evenings) and JSON-ish + dedupe (Weekend 2)
+remain to be implemented.
 See CLAUDE.md for the build log.
